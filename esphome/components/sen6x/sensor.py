@@ -102,7 +102,7 @@ def float_previously_pct(value):
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(SEN6xComponent),
+            cv.GenerateID(): cv.declare_id(SEN6XComponent),
             cv.Optional(CONF_PM_1_0): sensor.sensor_schema(
                 unit_of_measurement=UNIT_MICROGRAMS_PER_CUBIC_METER,
                 icon=ICON_CHEMICAL_WEAPON,
