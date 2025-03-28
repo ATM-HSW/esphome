@@ -24,7 +24,7 @@ const uint32_t SHORTEST_BASELINE_STORE_INTERVAL = 10800;
 // Store anyway if the baseline difference exceeds the max storage diff value
 const uint32_t MAXIMUM_STORAGE_DIFF = 50;
 
-struct Sen5xBaselines {
+struct Sen6xBaselines {
   int32_t state0;
   int32_t state1;
 } PACKED;  // NOLINT
@@ -46,14 +46,14 @@ struct TemperatureCompensation {
   uint16_t time_constant;
 };
 
-class SEN5XComponent : public PollingComponent, public sensirion_common::SensirionI2CDevice {
+class SEN6XComponent : public PollingComponent, public sensirion_common::SensirionI2CDevice {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
   void setup() override;
   void dump_config() override;
   void update() override;
 
-  enum Sen5xType { SEN50, SEN54, SEN55, SEN66, UNKNOWN };
+  enum Sen6xType { SEN50, SEN54, SEN55, SEN66, UNKNOWN };
 
   void set_pm_1_0_sensor(sensor::Sensor *pm_1_0) { pm_1_0_sensor_ = pm_1_0; }
   void set_pm_2_5_sensor(sensor::Sensor *pm_2_5) { pm_2_5_sensor_ = pm_2_5; }

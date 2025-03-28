@@ -38,11 +38,11 @@ CODEOWNERS = ["@martgras"]
 DEPENDENCIES = ["i2c"]
 AUTO_LOAD = ["sensirion_common"]
 
-sen5x_ns = cg.esphome_ns.namespace("sen5x")
-SEN5XComponent = sen5x_ns.class_(
-    "SEN5XComponent", cg.PollingComponent, sensirion_common.SensirionI2CDevice
+sen6x_ns = cg.esphome_ns.namespace("sen6x")
+SEN6XComponent = sen6x_ns.class_(
+    "SEN6XComponent", cg.PollingComponent, sensirion_common.SensirionI2CDevice
 )
-RhtAccelerationMode = sen5x_ns.enum("RhtAccelerationMode")
+RhtAccelerationMode = sen6x_ns.enum("RhtAccelerationMode")
 
 CONF_ACCELERATION_MODE = "acceleration_mode"
 CONF_ALGORITHM_TUNING = "algorithm_tuning"
@@ -61,7 +61,7 @@ CONF_VOC_BASELINE = "voc_baseline"
 
 
 # Actions
-StartFanAction = sen5x_ns.class_("StartFanAction", automation.Action)
+StartFanAction = sen6x_ns.class_("StartFanAction", automation.Action)
 
 ACCELERATION_MODES = {
     "low": RhtAccelerationMode.LOW_ACCELERATION,
@@ -102,7 +102,7 @@ def float_previously_pct(value):
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(SEN5XComponent),
+            cv.GenerateID(): cv.declare_id(SEN6xComponent),
             cv.Optional(CONF_PM_1_0): sensor.sensor_schema(
                 unit_of_measurement=UNIT_MICROGRAMS_PER_CUBIC_METER,
                 icon=ICON_CHEMICAL_WEAPON,
@@ -247,15 +247,15 @@ async def to_code(config):
         )
 
 
-SEN5X_ACTION_SCHEMA = maybe_simple_id(
+SEN6X_ACTION_SCHEMA = maybe_simple_id(
     {
-        cv.Required(CONF_ID): cv.use_id(SEN5XComponent),
+        cv.Required(CONF_ID): cv.use_id(SEN6XComponent),
     }
 )
 
 
 @automation.register_action(
-    "sen5x.start_fan_autoclean", StartFanAction, SEN5X_ACTION_SCHEMA
+    "sen6x.start_fan_autoclean", StartFanAction, SEN6X_ACTION_SCHEMA
 )
 async def sen54_fan_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])

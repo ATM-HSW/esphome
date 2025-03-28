@@ -1,19 +1,19 @@
-#include "sen5x.h"
+#include "sen6x.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
 #include <cinttypes>
 
 namespace esphome {
-namespace sen5x {
+namespace sen6x {
 
-static const char *const TAG = "sen5x";
+static const char *const TAG = "sen6x";
 
-static const uint16_t SEN5X_CMD_AUTO_CLEANING_INTERVAL = 0x8004;
-static const uint16_t SEN5X_CMD_READ_MEASUREMENT = 0x03C4;
-static const uint16_t SEN5X_CMD_RHT_ACCELERATION_MODE = 0x60F7;
-static const uint16_t SEN5X_CMD_START_MEASUREMENTS_RHT_ONLY = 0x0037;
-static const uint16_t SEN5X_CMD_STOP_MEASUREMENTS = 0x3f86;
+static const uint16_t SEN6X_CMD_AUTO_CLEANING_INTERVAL = 0x8004;
+static const uint16_t SEN6X_CMD_READ_MEASUREMENT = 0x03C4;
+static const uint16_t SEN6X_CMD_RHT_ACCELERATION_MODE = 0x60F7;
+static const uint16_t SEN6X_CMD_START_MEASUREMENTS_RHT_ONLY = 0x0037;
+static const uint16_t SEN6X_CMD_STOP_MEASUREMENTS = 0x3f86;
 
 static const uint16_t SEN66_CMD_RESET = 0xD304;
 static const uint16_t SEN66_STOP_MEASUREMENT = 0x104;
@@ -43,8 +43,8 @@ static const uint16_t CMD_START_MEASUREMENTS = 0x0021;
 static const uint16_t CMD_GET_FIRMWARE_VERSION = 0xD100;
 static const uint16_t CMD_GET_DATA_READY_STATUS = 0x0202;
 
-void SEN5XComponent::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up sen5x...");
+void SEN6XComponent::setup() {
+  ESP_LOGCONFIG(TAG, "Setting up sen6x...");
 
   // the sensor needs 1000 ms to enter the idle state
   this->set_timeout(1000, [this]() {
@@ -66,12 +66,12 @@ void SEN5XComponent::setup() {
     // In order to query the device periodic measurement must be ceased
     if (raw_read_status) {
       ESP_LOGD(TAG, "Sensor has data available, stopping periodic measurement");
-      if (!this->write_command(SEN5X_CMD_STOP_MEASUREMENTS)) {
+      if (!this->write_command(SEN6X_CMD_STOP_MEASUREMENTS)) {
         ESP_LOGE(TAG, "Failed to stop measurements");
         this->mark_failed();
         return;
       }
-      // According to the SEN5x datasheet the sensor will only respond to other commands after waiting 200 ms after
+      // According to the SEN6x datasheet the sensor will only respond to other commands after waiting 200 ms after
       // issuing the stop_periodic_measurement command
       // According to the SEN66 datasheet the sensor will only respond to other commands after waiting 1200 ms after
       stop_measurement_delay = 1200;
@@ -114,7 +114,7 @@ void SEN5XComponent::setup() {
         current_int++;
       } while (current_char && --max);
 
-      Sen5xType sen5x_type = UNKNOWN;
+      Sen6xType sen5x_type = UNKNOWN;
       if (product_name_ == "SEN50") {
         sen5x_type = SEN50;
       } else if (product_name_ == "SEN54") {
