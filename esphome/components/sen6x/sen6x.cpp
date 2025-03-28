@@ -129,18 +129,18 @@ void SEN6XComponent::setup() {
       }
       ESP_LOGD(TAG, "Productname %s", product_name_.c_str());
 
-      if (this->humidity_sensor_ && sen5x_type == SEN50) {
+      if (this->humidity_sensor_ && sen6x_type == SEN50) {
         ESP_LOGE(TAG, "For Relative humidity a SEN54 OR SEN55 is required. You are using a <%s> sensor",
                  this->product_name_.c_str());
         this->humidity_sensor_ = nullptr;  // mark as not used
-      } else if (this->temperature_sensor_ && sen5x_type == SEN50) {
+      } else if (this->temperature_sensor_ && sen6x_type == SEN50) {
         ESP_LOGE(TAG, "For Temperature a SEN54 OR SEN55 is required. You are using a <%s> sensor",
                  this->product_name_.c_str());
         this->temperature_sensor_ = nullptr;  // mark as not used
-      } else if (this->voc_sensor_ && sen5x_type == SEN50) {
+      } else if (this->voc_sensor_ && sen6x_type == SEN50) {
         ESP_LOGE(TAG, "For VOC a SEN54 OR SEN55 is required. You are using a <%s> sensor", this->product_name_.c_str());
         this->voc_sensor_ = nullptr;  // mark as not used
-      } else if (this->nox_sensor_ && sen5x_type != SEN55 && sen5x_type != SEN66) {
+      } else if (this->nox_sensor_ && sen6x_type != SEN55 && sen6x_type != SEN66) {
         ESP_LOGE(TAG, "For NOx a SEN55 is required. You are using a <%s> sensor", this->product_name_.c_str());
         this->nox_sensor_ = nullptr;  // mark as not used
       }
@@ -161,7 +161,7 @@ void SEN6XComponent::setup() {
         // This ensures the baseline storage is cleared after OTA
         // Serial numbers are unique to each sensor, so mulitple sensors can be used without conflict
         uint32_t hash = fnv1_hash(App.get_compilation_time() + std::to_string(combined_serial));
-        this->pref_ = global_preferences->make_preference<Sen5xBaselines>(hash, true);
+        this->pref_ = global_preferences->make_preference<Sen6xBaselines>(hash, true);
 
         if (this->pref_.load(&this->voc_baselines_storage_)) {
           ESP_LOGI(TAG, "Loaded VOC baseline state0: 0x%04" PRIX32 ", state1: 0x%04" PRIX32,
@@ -189,9 +189,9 @@ void SEN6XComponent::setup() {
       bool result;
       if (this->auto_cleaning_interval_.has_value()) {
         // override default value
-        result = write_command(SEN5X_CMD_AUTO_CLEANING_INTERVAL, this->auto_cleaning_interval_.value());
+        result = write_command(SEN6X_CMD_AUTO_CLEANING_INTERVAL, this->auto_cleaning_interval_.value());
       } else {
-        result = write_command(SEN5X_CMD_AUTO_CLEANING_INTERVAL);
+        result = write_command(SEN6X_CMD_AUTO_CLEANING_INTERVAL);
       }
       if (result) {
         delay(20);
@@ -201,9 +201,9 @@ void SEN6XComponent::setup() {
         }
       }
       if (acceleration_mode_.has_value()) {
-        result = this->write_command(SEN5X_CMD_RHT_ACCELERATION_MODE, acceleration_mode_.value());
+        result = this->write_command(SEN6X_CMD_RHT_ACCELERATION_MODE, acceleration_mode_.value());
       } else {
-        result = this->write_command(SEN5X_CMD_RHT_ACCELERATION_MODE);
+        result = this->write_command(SEN6X_CMD_RHT_ACCELERATION_MODE);
       }
       if (!result) {
         ESP_LOGE(TAG, "Failed to set rh/t acceleration mode");
@@ -235,7 +235,7 @@ void SEN6XComponent::setup() {
       }
 
       // Finally start sensor measurements
-      auto cmd = SEN5X_CMD_START_MEASUREMENTS_RHT_ONLY;
+      auto cmd = SEN6X_CMD_START_MEASUREMENTS_RHT_ONLY;
       if (this->pm_1_0_sensor_ || this->pm_2_5_sensor_ || this->pm_4_0_sensor_ || this->pm_10_0_sensor_) {
         // if any of the gas sensors are active we need a full measurement
         cmd = CMD_START_MEASUREMENTS;
@@ -253,8 +253,8 @@ void SEN6XComponent::setup() {
   });
 }
 
-void SEN5XComponent::dump_config() {
-  ESP_LOGCONFIG(TAG, "sen5x:");
+void SEN6XComponent::dump_config() {
+  ESP_LOGCONFIG(TAG, "sen6x:");
   LOG_I2C_DEVICE(this);
   if (this->is_failed()) {
     switch (this->error_code_) {
@@ -309,7 +309,7 @@ void SEN5XComponent::dump_config() {
   LOG_SENSOR("  ", "CO2", this->co2_sensor_);  // SEN66 only
 }
 
-void SEN5XComponent::update() {
+void SEN6XComponent::update() {
   if (!initialized_) {
     return;
   }
@@ -351,7 +351,7 @@ void SEN5XComponent::update() {
       return;
     }
   } else {
-    if (!this->write_command(SEN5X_CMD_READ_MEASUREMENT)) {
+    if (!this->write_command(SEN6X_CMD_READ_MEASUREMENT)) {
       this->status_set_warning();
       ESP_LOGD(TAG, "write error read measurement (%d)", this->last_error_);
       return;
@@ -416,7 +416,7 @@ void SEN5XComponent::update() {
   });
 }
 
-bool SEN5XComponent::write_tuning_parameters_(uint16_t i2c_command, const GasTuning &tuning) {
+bool SEN6XComponent::write_tuning_parameters_(uint16_t i2c_command, const GasTuning &tuning) {
   uint16_t params[6];
   params[0] = tuning.index_offset;
   params[1] = tuning.learning_time_offset_hours;
@@ -431,7 +431,7 @@ bool SEN5XComponent::write_tuning_parameters_(uint16_t i2c_command, const GasTun
   return result;
 }
 
-bool SEN5XComponent::write_temperature_compensation_(const TemperatureCompensation &compensation) {
+bool SEN6XComponent::write_temperature_compensation_(const TemperatureCompensation &compensation) {
   uint16_t params[3];
   params[0] = compensation.offset;
   params[1] = compensation.normalized_offset_slope;
@@ -443,7 +443,7 @@ bool SEN5XComponent::write_temperature_compensation_(const TemperatureCompensati
   return true;
 }
 
-bool SEN5XComponent::start_fan_cleaning() {
+bool SEN6XComponent::start_fan_cleaning() {
   if (!write_command(CMD_START_CLEANING_FAN)) {
     this->status_set_warning();
     ESP_LOGE(TAG, "write error start fan (%d)", this->last_error_);
@@ -454,5 +454,5 @@ bool SEN5XComponent::start_fan_cleaning() {
   return true;
 }
 
-}  // namespace sen5x
+}  // namespace sen6x
 }  // namespace esphome
