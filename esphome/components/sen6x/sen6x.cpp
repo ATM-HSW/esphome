@@ -114,17 +114,17 @@ void SEN6XComponent::setup() {
         current_int++;
       } while (current_char && --max);
 
-      Sen6xType sen5x_type = UNKNOWN;
+      Sen6xType sen6x_type = UNKNOWN;
       if (product_name_ == "SEN50") {
-        sen5x_type = SEN50;
+        sen6x_type = SEN50;
       } else if (product_name_ == "SEN54") {
-        sen5x_type = SEN54;
+        sen6x_type = SEN54;
       } else if (product_name_ == "SEN55") {
-        sen5x_type = SEN55;
+        sen6x_type = SEN55;
       } else if (product_name_ == "SEN66" ||
                  this->co2_sensor_) {  // Reading the product name of sen66 will return empty, so the sensor type is
                                        // selected based on the user's configuration.
-        sen5x_type = SEN66;
+        sen6x_type = SEN66;
         product_name_ = "SEN66";
       }
       ESP_LOGD(TAG, "Productname %s", product_name_.c_str());

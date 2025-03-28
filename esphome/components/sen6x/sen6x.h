@@ -7,7 +7,7 @@
 #include "esphome/core/preferences.h"
 
 namespace esphome {
-namespace sen5x {
+namespace sen6x {
 
 enum ERRORCODE {
   COMMUNICATION_FAILED,
@@ -121,7 +121,7 @@ class SEN6XComponent : public PollingComponent, public sensirion_common::Sensiri
   std::string product_name_;
   uint8_t serial_number_[4];
   uint16_t firmware_version_;
-  Sen5xBaselines voc_baselines_storage_;
+  Sen6xBaselines voc_baselines_storage_;
   bool store_baseline_;
   uint32_t seconds_since_last_store_;
   ESPPreferenceObject pref_;
@@ -132,5 +132,5 @@ class SEN6XComponent : public PollingComponent, public sensirion_common::Sensiri
   optional<TemperatureCompensation> temperature_compensation_;
 };
 
-}  // namespace sen5x
+}  // namespace sen6x
 }  // namespace esphome

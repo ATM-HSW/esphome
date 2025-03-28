@@ -9,7 +9,7 @@ namespace sen6x {
 
 template<typename... Ts> class StartFanAction : public Action<Ts...> {
  public:
-  explicit StartFanAction(SEN5XComponent *sen6x) : sen6x_(sen6x) {}
+  explicit StartFanAction(SEN6XComponent *sen6x) : sen6x_(sen6x) {}
 
   void play(Ts... x) override { this->sen6x_->start_fan_cleaning(); }
 
